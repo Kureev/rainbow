@@ -6,13 +6,13 @@ const withNetInfo = ComponentToWrap =>
     withState('isConnected', 'setIsConnected', true),
     lifecycle({
       componentDidMount() {
-        NetInfo.isConnected.addEventListener(
+        NetInfo.isInternetReachable.addEventListener(
           'connectionChange',
           this.props.setIsConnected
         );
       },
       componentWillUnmount() {
-        NetInfo.isConnected.removeEventListener(
+        NetInfo.isInternetReachable.removeEventListener(
           'connectionChange',
           this.props.setIsConnected
         );
