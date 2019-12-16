@@ -31,6 +31,7 @@ import SendIcon from './svg/SendIcon';
 import SendSmallIcon from './svg/SendSmallIcon';
 import ShareIcon from './svg/ShareIcon';
 import SignatureIcon from './svg/SignatureIcon';
+import SmallSwapIcon from './svg/SmallSwapIcon';
 import SpinnerIcon from './svg/SpinnerIcon';
 import StarIcon from './svg/StarIcon';
 import SwapIcon from './svg/SwapIcon';
@@ -72,6 +73,7 @@ Icon.IconTypes = {
   sendSmall: SendSmallIcon,
   share: ShareIcon,
   signature: SignatureIcon,
+  smallSwap: SmallSwapIcon,
   spinner: SpinnerIcon,
   star: StarIcon,
   swap: SwapIcon,
