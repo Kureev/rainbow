@@ -5,4 +5,3 @@ export { default as InvestmentExpandedState } from './InvestmentExpandedState';
 export { default as SwapDetailsState } from './SwapDetailsState';
 export { default as TokenExpandedState } from './TokenExpandedState';
 export { default as UniqueTokenExpandedState } from './UniqueTokenExpandedState';
-
