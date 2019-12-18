@@ -1,5 +1,4 @@
-import React, { useCallback } from 'react';
-import { useNavigation } from 'react-navigation-hooks';
+import React from 'react';
 import styled from 'styled-components/primitives';
 import { colors, padding, position } from '../../styles';
 import { TouchableScale } from '../animations';
@@ -28,37 +27,26 @@ const InfoButton = styled(Centered).attrs({
   top: 0;
 `;
 
-const ExchangeModalHeader = () => {
-  const { navigate } = useNavigation();
+const ExchangeModalHeader = ({ onPressDetails }) => (
+  <ColumnWithMargins align="center" css={padding(8, 0)} margin={6}>
+    <SheetHandle />
+    <Text
+      align="center"
+      letterSpacing="tighter"
+      lineHeight="loose"
+      size="large"
+      weight="bold"
+    >
+      Swap
+    </Text>
+    <InfoButton onPress={onPressDetails} useNativeDriver>
+      <Icon
+        {...position.sizeAsObject(18)}
+        color={colors.alpha(colors.blueGreyDark, 0.3)}
+        name="info"
+      />
+    </InfoButton>
+  </ColumnWithMargins>
+);
 
-  const onPressInfo = useCallback(() => {
-    navigate('OverlayExpandedAssetScreen', {
-      type: 'swap_details',
-    });
-  }, [navigate]);
-
-  return (
-    <ColumnWithMargins align="center" css={padding(8, 0)} margin={6}>
-      <SheetHandle />
-      <Text
-        align="center"
-        letterSpacing="tighter"
-        lineHeight="loose"
-        size="large"
-        weight="bold"
-      >
-        Swap
-      </Text>
-      <InfoButton onPress={onPressInfo} useNativeDriver>
-        <Icon
-          {...position.sizeAsObject(18)}
-          color={colors.alpha(colors.blueGreyDark, 0.3)}
-          name="info"
-        />
-      </InfoButton>
-    </ColumnWithMargins>
-  );
-};
-
-const neverRerender = () => true;
-export default React.memo(ExchangeModalHeader, neverRerender);
+export default React.memo(ExchangeModalHeader);

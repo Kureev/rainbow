@@ -259,6 +259,28 @@ class ExchangeModal extends Component {
     if (this.outputFieldRef) this.outputFieldRef.clear();
   };
 
+  findNextFocused = () => {
+    const inputRefTag = getNativeTag(this.inputFieldRef);
+    const nativeInputRefTag = getNativeTag(this.nativeFieldRef);
+    const outputRefTag = getNativeTag(this.outputFieldRef);
+
+    const lastFocusedIsInputType =
+      this.lastFocusedInput === inputRefTag ||
+      this.lastFocusedInput === nativeInputRefTag;
+
+    const lastFocusedIsOutputType = this.lastFocusedInput === outputRefTag;
+
+    if (lastFocusedIsInputType && !this.state.inputCurrency) {
+      return outputRefTag;
+    }
+
+    if (lastFocusedIsOutputType && !this.state.outputCurrency) {
+      return inputRefTag;
+    }
+
+    return this.lastFocusedInput;
+  };
+
   focusInputField = () => {
     if (this.inputFieldRef) {
       this.inputFieldRef.focus();
@@ -564,6 +586,15 @@ class ExchangeModal extends Component {
     }
   };
 
+  getMarketPrice = () => {
+    const { allAssets, inputReserve } = this.props;
+    if (!inputReserve) return 0;
+    const ethPrice = ethereumUtils.getEthPriceUnit(allAssets);
+    const inputMarketDetails = getUniswapMarketDetails(undefined, inputReserve);
+    const assetToEthPrice = get(inputMarketDetails, 'marketRate.rate');
+    return divide(ethPrice, assetToEthPrice) || 0;
+  };
+
   handleFocusField = ({ currentTarget }) => {
     this.lastFocusedInput = currentTarget;
   };
@@ -650,33 +681,32 @@ class ExchangeModal extends Component {
     }
   };
 
-  findNextFocused = () => {
-    const inputRefTag = getNativeTag(this.inputFieldRef);
-    const nativeInputRefTag = getNativeTag(this.nativeFieldRef);
-    const outputRefTag = getNativeTag(this.outputFieldRef);
-
-    const lastFocusedIsInputType =
-      this.lastFocusedInput === inputRefTag ||
-      this.lastFocusedInput === nativeInputRefTag;
-
-    const lastFocusedIsOutputType = this.lastFocusedInput === outputRefTag;
-
-    if (lastFocusedIsInputType && !this.state.inputCurrency) {
-      return outputRefTag;
-    }
-
-    if (lastFocusedIsOutputType && !this.state.outputCurrency) {
-      return inputRefTag;
-    }
-
-    return this.lastFocusedInput;
-  };
-
   handleKeyboardManagement = () => {
     if (this.lastFocusedInput !== TextInput.State.currentlyFocusedField()) {
       TextInput.State.focusTextInput(this.findNextFocused());
       this.lastFocusedInput = null;
     }
+  };
+
+  navigateToSwapDetailsModal = () => {
+    const {
+      inputCurrency,
+      inputExecutionRate,
+      inputNativePrice,
+      outputCurrency,
+      outputExecutionRate,
+      outputNativePrice,
+    } = this.state;
+
+    this.props.navigation.navigate('OverlayExpandedAssetScreen', {
+      inputCurrencySymbol: get(inputCurrency, 'symbol'),
+      inputExecutionRate,
+      inputNativePrice,
+      outputCurrencySymbol: get(outputCurrency, 'symbol'),
+      outputExecutionRate,
+      outputNativePrice,
+      type: 'swap_details',
+    });
   };
 
   navigateToSelectInputCurrency = () => {
@@ -691,15 +721,6 @@ class ExchangeModal extends Component {
       onSelectCurrency: this.setOutputCurrency,
       type: CurrencySelectionTypes.output,
     });
-  };
-
-  getMarketPrice = () => {
-    const { allAssets, inputReserve } = this.props;
-    if (!inputReserve) return 0;
-    const ethPrice = ethereumUtils.getEthPriceUnit(allAssets);
-    const inputMarketDetails = getUniswapMarketDetails(undefined, inputReserve);
-    const assetToEthPrice = get(inputMarketDetails, 'marketRate.rate');
-    return divide(ethPrice, assetToEthPrice) || 0;
   };
 
   setInputAmount = (inputAmount, amountDisplay, inputAsExactAmount = true) => {
@@ -826,8 +847,6 @@ class ExchangeModal extends Component {
       inputAmount,
       inputAmountDisplay,
       inputCurrency,
-      // inputExecutionRate,
-      // inputNativePrice,
       isAssetApproved,
       isAuthorizing,
       isSufficientBalance,
@@ -836,8 +855,6 @@ class ExchangeModal extends Component {
       outputAmount,
       outputAmountDisplay,
       outputCurrency,
-      // outputExecutionRate,
-      // outputNativePrice,
       showConfirmButton,
       slippage,
     } = this.state;
@@ -867,7 +884,9 @@ class ExchangeModal extends Component {
               overflow="visible"
             >
               <GestureBlocker type="top" />
-              <ExchangeModalHeader />
+              <ExchangeModalHeader
+                onPressDetails={this.navigateToSwapDetailsModal}
+              />
               <ExchangeInputField
                 inputAmount={inputAmountDisplay}
                 inputCurrencySymbol={get(inputCurrency, 'symbol', null)}
